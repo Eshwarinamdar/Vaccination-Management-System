@@ -14,11 +14,11 @@ export const getAppointmentHistory = async (patientId) => {
   }
 };
 
-export const getHomeVisitAppointment = async () => {
+export const getHomeVisitAppointment = async (centerId) => {
   try {
     const response = await axios.get(
-      `${API_BASE_URL}/appointment/get-home-visit-appointments`
+      `${API_BASE_URL}/appointment/get-home-visit-appointments/${centerId}`
     );
     return response;
-  } catch (error) {}
+  } catch (error) { }
 };

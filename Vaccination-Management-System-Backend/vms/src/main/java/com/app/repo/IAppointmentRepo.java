@@ -12,32 +12,27 @@ import com.app.entities.Appointment_Status;
 import com.app.entities.Appointment_Type;
 import com.app.entities.Appointments;
 import com.app.entities.Patient;
+import com.app.entities.VaccinationCenter;
 
 @Repository
 public interface IAppointmentRepo extends JpaRepository<Appointments, Long> {
 
-	// Custom query method to find all appointments with HOME_VISIT type and
-	// SCHEDULED status
-	List<Appointments> findByAppointmentTypeAndAppointmentStatus(Appointment_Type appointmentType,
-			Appointment_Status appointmentStatus);
+	List<Appointments> findByAppointmentTypeAndAppointmentStatusAndVaccinationCenter(Appointment_Type appointmentType,
+			Appointment_Status appointmentStatus, VaccinationCenter vaccinationCenter);
 
 	List<Appointments> findAByStaff_userId(Long staffId);
 
 	List<Appointments> findByPatient(Patient patient);
 
+	Appointments findByAppointmentId(Long appointmentId);
+	
 	@Query("SELECT new com.app.dto.AppointmentDetailsDTO(ap.appointmentId, p.firstName, a.street, a.city, a.state, a.zipCode, vc.centerName, ap.bookedAppointmentDate) "
 			+ "FROM Appointments ap " + "JOIN ap.patient p " + "JOIN p.address a " + "JOIN ap.vaccinationCenter vc "
 			+ "WHERE ap.staff.userId = :staffId")
 	List<AppointmentDetailsDTO> getAllAppointmentsByStaffId(@Param("staffId") Long staffId);
 
-	Appointments findByAppointmentId(Long appointmentId);
-	
 	@Query("SELECT new com.app.dto.AppointmentDetailsDTO(ap.appointmentId, p.firstName, a.street, a.city, a.state, a.zipCode, vc.centerName, ap.bookedAppointmentDate) "
-            + "FROM Appointments ap "
-            + "JOIN ap.patient p "
-            + "JOIN p.address a "
-            + "JOIN ap.vaccinationCenter vc "
-            + "WHERE ap.staff.userId = :staffId AND ap.vaccine IS NULL")
+			+ "FROM Appointments ap " + "JOIN ap.patient p " + "JOIN p.address a " + "JOIN ap.vaccinationCenter vc "
+			+ "WHERE ap.staff.userId = :staffId AND vc.centerId = ap.staff.centerId AND ap.vaccine IS NULL")
 	List<AppointmentDetailsDTO> findAppointmentsWithNullVaccine(@Param("staffId") Long staffId);
-
 }

@@ -11,10 +11,12 @@ public interface IAppointmentService {
 
 	public ApiResponse addAppointment(AppointmentDTO appointment);
 
-	List<HomeVisitAppointmentDTO> getScheduledHomeVisitAppointments();
+	List<HomeVisitAppointmentDTO> getScheduledHomeVisitAppointments(Long centerId);
 
 	public String assignVaccineToAppointment(AppointmentDetails2DTO dto);
 
 	public String assignVaccineToAppointmentDue(AppointmentDetails2DTO dto);
+
+	List<HomeVisitAppointmentDTO> getScheduledCenterVisitAppointments(Long centerId);
 
 }

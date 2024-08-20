@@ -27,16 +27,7 @@ const AdminDashboard = () => {
   const [selectedStaff, setSelectedStaff] = useState({});
   const navigate = useNavigate();
 
-  const fetchAppointments = async () => {
-    if (view === "home") {
-      try {
-        const response = await getHomeVisitAppointment();
-        setAppointments(response.data);
-      } catch (error) {
-        setError("Failed to fetch appointments.");
-      }
-    }
-  };
+
 
   useEffect(() => {
     const fetchVaccinationDetails = async () => {
@@ -93,6 +84,17 @@ const AdminDashboard = () => {
     }
   }, [view]);
 
+  const fetchAppointments = async () => {
+    if (view === "home") {
+      try {
+        const centerId = sessionStorage.getItem("vaccinationCenterId");
+        const response = await getHomeVisitAppointment(centerId);
+        setAppointments(response.data);
+      } catch (error) {
+        setError("Failed to fetch appointments.");
+      }
+    }
+  };
   const handleAddVaccine = async () => {
     const centerId = sessionStorage.getItem("vaccinationCenterId");
 

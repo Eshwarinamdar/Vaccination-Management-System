@@ -120,3 +120,7 @@ export async function assignVaccineToAppointment(appointmentId, vaccineName) {
     console.error("Error assigning vaccine:", error);
   }
 }
+
+export const getCenterVisitAppointments = async (centerId) => {
+  return await axios.get(`${API_BASE_URL}/appointment/get-center-visit-appointments/${centerId}`);
+};

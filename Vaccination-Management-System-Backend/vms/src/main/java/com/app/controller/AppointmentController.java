@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,9 +34,16 @@ public class AppointmentController {
 	@Autowired
 	private ISlotsService slotsService;
 
-	@GetMapping("/get-home-visit-appointments")
-	public ResponseEntity<List<HomeVisitAppointmentDTO>> getAppointmentByType() {
-		return ResponseEntity.status(HttpStatus.OK).body(appointmentService.getScheduledHomeVisitAppointments());
+	@GetMapping("/get-home-visit-appointments/{centerId}")
+	public ResponseEntity<List<HomeVisitAppointmentDTO>> getAppointmentByType(@PathVariable Long centerId) {
+		return ResponseEntity.status(HttpStatus.OK)
+				.body(appointmentService.getScheduledHomeVisitAppointments(centerId));
+	}
+
+	@GetMapping("/get-center-visit-appointments/{centerId}")
+	public ResponseEntity<List<HomeVisitAppointmentDTO>> getAppointmentByTypeCenter(@PathVariable Long centerId) {
+		return ResponseEntity.status(HttpStatus.OK)
+				.body(appointmentService.getScheduledCenterVisitAppointments(centerId));
 	}
 
 	@GetMapping("/slots")

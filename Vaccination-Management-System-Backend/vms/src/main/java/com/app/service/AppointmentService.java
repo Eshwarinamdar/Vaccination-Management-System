@@ -45,11 +45,27 @@ public class AppointmentService implements IAppointmentService {
 	private ModelMapper mapper;
 
 	@Override
-	public List<HomeVisitAppointmentDTO> getScheduledHomeVisitAppointments() {
+	public List<HomeVisitAppointmentDTO> getScheduledHomeVisitAppointments(Long centerId) {
+		VaccinationCenter center = centerRepo.findById(centerId)
+				.orElseThrow(() -> new ResourceNotFoundException("Center not found"));
+
 		return appointmentRepo
-				.findByAppointmentTypeAndAppointmentStatus(Appointment_Type.HOME_VISIT, Appointment_Status.SCHEDULED)
-				.stream()
-				.filter(appointment -> appointment.getStaff() == null)
+				.findByAppointmentTypeAndAppointmentStatusAndVaccinationCenter(Appointment_Type.HOME_VISIT,
+						Appointment_Status.SCHEDULED, center)
+				.stream().filter(appointment -> appointment.getStaff() == null)
+				.map(appointment -> mapper.map(appointment, HomeVisitAppointmentDTO.class))
+				.collect(Collectors.toList());
+	}
+
+	@Override
+	public List<HomeVisitAppointmentDTO> getScheduledCenterVisitAppointments(Long centerId) {
+		VaccinationCenter center = centerRepo.findById(centerId)
+				.orElseThrow(() -> new ResourceNotFoundException("Center not found"));
+
+		return appointmentRepo
+				.findByAppointmentTypeAndAppointmentStatusAndVaccinationCenter(Appointment_Type.CENTER_VISIT,
+						Appointment_Status.SCHEDULED, center)
+				.stream().filter(appointment -> appointment.getStaff() == null)
 				.map(appointment -> mapper.map(appointment, HomeVisitAppointmentDTO.class))
 				.collect(Collectors.toList());
 	}
