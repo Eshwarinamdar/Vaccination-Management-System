@@ -96,14 +96,16 @@ const MultiStepRegistration = () => {
           {/* Step Indicator */}
           <div className="flex items-center justify-between mb-6">
             <div
-              className={`flex-1 text-center ${step === 1 ? "text-blue-500" : "text-gray-400"
-                }`}
+              className={`flex-1 text-center ${
+                step === 1 ? "text-blue-500" : "text-gray-400"
+              }`}
             >
               {step === 1 ? "●" : "✔"} Step 1: Register Center
             </div>
             <div
-              className={`flex-1 text-center ${step === 2 ? "text-blue-500" : "text-gray-400"
-                }`}
+              className={`flex-1 text-center ${
+                step === 2 ? "text-blue-500" : "text-gray-400"
+              }`}
             >
               {step === 2 ? "●" : step > 1 ? "✔" : "○"} Step 2: Register Admin
             </div>
@@ -242,6 +244,7 @@ const MultiStepRegistration = () => {
                   onChange={(e) => setAadharCardNumber(e.target.value)}
                   className="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline w-full"
                   placeholder="Aadhar Card Number"
+                  maxLength={12}
                 />
               </div>
               <div className="flex items-center justify-between">

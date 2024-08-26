@@ -56,6 +56,7 @@ public class HealthStaffService implements IHealthStaffService {
 	@Override
 	public List<AppointmentDetailsDTO> getAllAppointmentsByStaffId(Long staffId) {
 		// Fetch the HealthStaff entity and throw an exception if not found
+		@SuppressWarnings("unused")
 		HealthStaff staff = healthStaffRepo.findById(staffId)
 				.orElseThrow(() -> new ResourceNotFoundException("Staff Not found with ID: " + staffId));
 

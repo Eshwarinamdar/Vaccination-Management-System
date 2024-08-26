@@ -173,6 +173,7 @@ const Register = () => {
                   onChange={(e) => setZipCode(e.target.value)}
                   className="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline w-full"
                   placeholder="Zip Code"
+                  maxLength={6}
                 />
               </div>
             </div>

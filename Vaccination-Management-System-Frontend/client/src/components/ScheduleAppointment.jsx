@@ -32,10 +32,34 @@ function ScheduleAppointment() {
   useEffect(() => {
     // Hard-coded slots
     const hardCodedSlots = [
-      { slotId: 1, slot: "SLOT_1", date: selectedDate, capacity: 0 },
-      { slotId: 2, slot: "SLOT_2", date: selectedDate, capacity: 0 },
-      { slotId: 3, slot: "SLOT_3", date: selectedDate, capacity: 0 },
-      { slotId: 4, slot: "SLOT_4", date: selectedDate, capacity: 0 },
+      {
+        slotId: 1,
+        slot: "SLOT_1",
+        date: selectedDate,
+        capacity: 0,
+        time: "09:00AM - 11:00AM",
+      },
+      {
+        slotId: 2,
+        slot: "SLOT_2",
+        date: selectedDate,
+        capacity: 0,
+        time: "11:00AM - 01:00PM",
+      },
+      {
+        slotId: 3,
+        slot: "SLOT_3",
+        date: selectedDate,
+        capacity: 0,
+        time: "02:00PM - 04:00PM",
+      },
+      {
+        slotId: 4,
+        slot: "SLOT_4",
+        date: selectedDate,
+        capacity: 0,
+        time: "04:00PM - 06:00PM",
+      },
     ];
     setAvailableSlots(hardCodedSlots);
   }, [selectedDate]);
@@ -109,16 +133,24 @@ function ScheduleAppointment() {
       appointmentType,
       appointmentStatus: "SCHEDULED",
     };
-    console.log(selectedCenter.id);
-    console.log(selectedDate);
-    console.log(selectedSlot);
-    console.log(appointmentType);
 
     try {
       await scheduleAppointment(appointment);
       setAppointmentStatus("success");
+
+      // Clear the entered data
+      setPincode("");
+      setCenters([]);
+      setSelectedCenter({ id: "", name: "" });
+      setAvailableSlots([]);
+      setSelectedSlot(null);
+      setAppointmentType("");
+      setSelectedDate(format(new Date(), "yyyy-MM-dd"));
+
+      // Optional: If needed, update capacity or add new slot
       // await updateCapacity(selectedSlot);
       await addSlot(selectedSlot);
+
       setError("");
     } catch (err) {
       setAppointmentStatus("failure");
@@ -213,13 +245,14 @@ function ScheduleAppointment() {
             {availableSlots.map((slot) => (
               <button
                 key={slot.slotId}
-                className={`border p-2 text-left ${selectedSlot && selectedSlot.slotId === slot.slotId
-                  ? "bg-gray-200"
-                  : "bg-white"
-                  }`}
+                className={`border p-2 text-left ${
+                  selectedSlot && selectedSlot.slotId === slot.slotId
+                    ? "bg-gray-200"
+                    : "bg-white"
+                }`}
                 onClick={() => handleSlotClick(slot)}
               >
-                Slot {slot.slot} - Capacity: {slot.capacity}
+                {slot.slot} : {slot.time}
               </button>
             ))}
           </div>

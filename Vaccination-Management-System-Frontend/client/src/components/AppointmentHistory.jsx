@@ -38,7 +38,7 @@ const AppointmentHistoryTable = () => {
         );
         setUpcomingAppointments(upcomingResponse.data);
       } catch (error) {
-        setError("Failed to fetch data");
+        setError("No History Found");
       } finally {
         setLoading(false);
       }
@@ -48,7 +48,8 @@ const AppointmentHistoryTable = () => {
   }, []);
 
   if (loading) return <p>Loading...</p>;
-  if (error) return <p>{error}</p>;
+  if (error)
+    return <p className="text-3xl font-semibold text-red-600">{error}</p>;
 
   return (
     <div className="container mx-auto p-6">

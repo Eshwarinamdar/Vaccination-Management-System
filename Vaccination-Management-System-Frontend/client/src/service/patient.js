@@ -24,26 +24,6 @@ export const getAvailableSlots = async (centerId, date) => {
   }
 };
 
-// export const updateSlotCapacity = async (
-//   vaccinationCenterId,
-//   slotName,
-//   date
-// ) => {
-//   try {
-//     const response = await axios.post(`${API_BASE_URL}/slots/update-capacity`, {
-//       vaccinationCenterId,
-//       slotName,
-//       date,
-//     });
-//     return response;
-//   } catch (error) {
-//     console.error("Error updating slot capacity:", error);
-//     throw error;
-//   }
-// };
-
-// Add a new slot
-// Add a new slot
 export const addNewSlot = async (centerId, slotName, date, patientId) => {
   try {
     const response = await axios.post(`${API_BASE_URL}/slots/add`, {
@@ -137,7 +117,7 @@ export const updatePatientProfile = async (patientId, profileData) => {
   }
 };
 
-export const updatePatientAddress = async (patientId, addressDetails) => {
+export const updatePatientAddress = async (id, addressDetails, addressId) => {
   try {
     const response = await axios.put(
       `${API_BASE_URL}/patient/update-address`, // Replace with your actual endpoint
@@ -149,7 +129,8 @@ export const updatePatientAddress = async (patientId, addressDetails) => {
       },
       {
         params: {
-          id: patientId,
+          patientId: id,
+          addressId: addressId,
         },
         headers: {
           "Content-Type": "application/json",

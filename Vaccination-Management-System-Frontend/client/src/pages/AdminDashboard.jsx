@@ -2,7 +2,13 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getVaccinationCenterDetails } from "../service/admin";
 import { toast, ToastContainer } from "react-toastify";
-import { getHealthStaff, increaseAppointment, registerStaff } from "../service/healthstaff";
+import { format } from "date-fns";
+
+import {
+  getHealthStaff,
+  increaseAppointment,
+  registerStaff,
+} from "../service/healthstaff";
 import { addVaccine } from "../service/vaccine";
 import { getHomeVisitAppointment } from "../service/appointment";
 
@@ -27,8 +33,6 @@ const AdminDashboard = () => {
   const [selectedStaff, setSelectedStaff] = useState({});
   const navigate = useNavigate();
 
-
-
   useEffect(() => {
     const fetchVaccinationDetails = async () => {
       const centerId = sessionStorage.getItem("vaccinationCenterId");
@@ -43,7 +47,9 @@ const AdminDashboard = () => {
         const response = await getVaccinationCenterDetails(centerId);
         response.data.vaccinationCenterDto.centerName =
           response.data.vaccinationCenterDto.centerName.toUpperCase();
+
         setVaccinationDetails(response.data);
+        console.log(vaccinationDetails?.vaccineDto);
       } catch (error) {
         setError("Failed to fetch vaccination details.");
       } finally {
@@ -117,7 +123,7 @@ const AdminDashboard = () => {
   };
 
   const handleStaffChange = (appointmentId, staffId) => {
-    console.log("StaffId", staffId)
+    console.log("StaffId", staffId);
     setSelectedStaff(staffId);
     setSelectedStaff((prevState) => ({
       ...prevState,
@@ -144,11 +150,6 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleRevoke = async (id) => {
-    console.log(`Revoked appointment with ID: ${id}`);
-    // Add logic to handle revocation
-  };
-
   const handleStaffRegistration = async () => {
     const staffData = {
       firstName: StaffFirstName,
@@ -163,6 +164,12 @@ const AdminDashboard = () => {
       const response = await registerStaff(staffData);
       if (response.status === 200) {
         toast.success("Registered Successfully");
+        setFirstName("");
+        setLastName("");
+        setEmail("");
+        setPassword("");
+        setPhoneNumber("");
+        setAadharCardNumber("");
         setView("home");
       } else {
         toast.error("Registration Failed");
@@ -183,9 +190,9 @@ const AdminDashboard = () => {
   return (
     <>
       <ToastContainer />
-      <div className="flex h-screen bg-gray-100">
+      <div className="flex h-screen bg-gray-100 ">
         {/* Sidebar */}
-        <aside className="w-64 bg-gray-800 text-white">
+        <aside className="w-64 bg-gray-800 text-white ">
           <div className="p-4">
             <h1 className="text-xl font-bold mb-6">Admin Dashboard</h1>
             <ul>
@@ -207,18 +214,18 @@ const AdminDashboard = () => {
               </li>
               <li>
                 <a
-                  onClick={() => setView("healthStaff")}
+                  onClick={() => setView("healthStaffRegister")}
                   className="block p-2 hover:bg-gray-700 rounded"
                 >
-                  Health Staff Details
+                  Register Health Staff
                 </a>
               </li>
               <li>
                 <a
-                  onClick={() => setView("vaccines")}
+                  onClick={() => setView("healthStaff")}
                   className="block p-2 hover:bg-gray-700 rounded"
                 >
-                  Available Vaccines
+                  Health Staff Details
                 </a>
               </li>
               <li>
@@ -231,10 +238,10 @@ const AdminDashboard = () => {
               </li>
               <li>
                 <a
-                  onClick={() => setView("healthStaffRegister")}
+                  onClick={() => setView("vaccines")}
                   className="block p-2 hover:bg-gray-700 rounded"
                 >
-                  Register Health Staff
+                  Available Vaccines
                 </a>
               </li>
               <li>
@@ -257,69 +264,72 @@ const AdminDashboard = () => {
                 {vaccinationDetails?.vaccinationCenterDto.centerName ||
                   "Vaccination Center Name"}
               </h2>
-              <div className="bg-white p-4 rounded shadow-md">
-                <h3 className="text-xl font-semibold mb-2">Approval Request</h3>
+              <div className="bg-white p-6 rounded-lg shadow-md">
+                <h3 className="text-xl font-semibold mb-4">Approval Request</h3>
                 {appointments.length > 0 ? (
                   <ul>
                     {appointments.map((appointment) => (
                       <li
                         key={appointment.appointmentId}
-                        className="mb-4 p-4 border rounded"
+                        className="mb-4 p-4 border rounded-lg flex items-center justify-between"
                       >
-                        <p className="font-semibold">
-                          Patient Name: {appointment.patient.firstName}{" "}
-                          {appointment.patient.lastName}
-                        </p>
-                        <p>
-                          Date:{" "}
-                          {new Date(
-                            appointment.bookedAppointmentDate
-                          ).toLocaleDateString()}
-                        </p>
-                        <p>
-                          Time:{" "}
-                          {new Date(
-                            appointment.createdAppointmentOn
-                          ).toLocaleTimeString()}
-                        </p>
-                        <div className="mt-2">
-                          <label className="font-semibold">Select Staff:</label>
-                          <select
-                            value={
-                              selectedStaff[appointment.appointmentId] || ""
-                            }
-                            onChange={(e) =>
-                              handleStaffChange(
-                                appointment.appointmentId,
-                                e.target.value
-                              )
-                            }
-                            className="ml-2 p-2 border rounded"
-                          >
-                            <option value="">Select Staff</option>
-                            {StaffDetails.map((staff) => (
-                              <option key={staff.id} value={staff.userId}>
-                                {staff.firstName} {staff.lastName}
-                              </option>
-                            ))}
-                          </select>
+                        {/* Patient Details */}
+                        <div className="flex-1 text-start">
+                          <p className="font-semibold text-lg mb-1">
+                            Patient Name: {appointment.patient.firstName}{" "}
+                            {appointment.patient.lastName}
+                          </p>
+                          <p>
+                            Date:{" "}
+                            {format(
+                              new Date(appointment.bookedAppointmentDate),
+                              "MMMM d, yyyy"
+                            )}
+                          </p>
+                          <p>
+                            Time:{" "}
+                            {format(
+                              new Date(appointment.createdAppointmentOn),
+                              "h:mm a"
+                            )}
+                          </p>
                         </div>
-                        <button
-                          onClick={() =>
-                            handleApprove(appointment.appointmentId)
-                          }
-                          className="bg-green-500 text-white px-4 py-2 mt-2 rounded hover:bg-green-700"
-                        >
-                          Approve
-                        </button>
-                        <button
-                          onClick={() =>
-                            handleRevoke(appointment.appointmentId)
-                          }
-                          className="bg-red-500 text-white px-4 py-2 mt-2 rounded ml-2 hover:bg-red-700"
-                        >
-                          Revoke
-                        </button>
+
+                        {/* Dropdown and Buttons */}
+                        <div className="flex items-center gap-4">
+                          <div className="flex flex-col mr-4">
+                            <label className="font-semibold mb-1">
+                              Select Staff:
+                            </label>
+                            <select
+                              value={
+                                selectedStaff[appointment.appointmentId] || ""
+                              }
+                              onChange={(e) =>
+                                handleStaffChange(
+                                  appointment.appointmentId,
+                                  e.target.value
+                                )
+                              }
+                              className="p-2 border rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 capitalize"
+                            >
+                              <option value="">Select Staff</option>
+                              {StaffDetails.map((staff) => (
+                                <option key={staff.id} value={staff.userId}>
+                                  {staff.firstName} {staff.lastName}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          <button
+                            onClick={() =>
+                              handleApprove(appointment.appointmentId)
+                            }
+                            className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-200 mt-7"
+                          >
+                            Approve
+                          </button>
+                        </div>
                       </li>
                     ))}
                   </ul>
@@ -336,7 +346,7 @@ const AdminDashboard = () => {
                 Details of All Health Staff
               </h3>
               {StaffDetails.length > 0 ? (
-                <table className="min-w-full table-auto border-collapse border border-gray-300">
+                <table className="min-w-full table-auto border-collapse border border-gray-300 capitalize">
                   <thead>
                     <tr className="bg-gray-200">
                       <th className="border border-gray-300 px-4 py-2">
@@ -371,7 +381,7 @@ const AdminDashboard = () => {
                         <td className="border border-gray-300 px-4 py-2">
                           {staff.lastName}
                         </td>
-                        <td className="border border-gray-300 px-4 py-2">
+                        <td className="border border-gray-300 px-4 py-2 lowercase">
                           {staff.email}
                         </td>
                         <td className="border border-gray-300 px-4 py-2">
@@ -398,91 +408,158 @@ const AdminDashboard = () => {
 
           {view === "viewProfile" && (
             <>
-              <h2 className="text-2xl font-bold mb-4">Admin Profile</h2>
-              <div className="bg-white p-4 rounded shadow-md">
-                <p>First Name: {adminData.adminFirstName}</p>
-                <p>Last Name: {adminData.adminLastName}</p>
-                <p>Email: {adminData.adminEmail}</p>
-                <p>Phone: {adminData.adminPhone}</p>
+              <h2 className="text-3xl font-bold mb-6 text-gray-800">
+                Admin Profile
+              </h2>
+              <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg mx-auto capitalize">
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center gap-4">
+                    <span className="font-semibold text-gray-700 w-32">
+                      First Name:
+                    </span>
+                    <p className="text-gray-600">{adminData.adminFirstName}</p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <span className="font-semibold text-gray-700 w-32">
+                      Last Name:
+                    </span>
+                    <p className="text-gray-600">{adminData.adminLastName}</p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <span className="font-semibold text-gray-700 w-32 ">
+                      Email:
+                    </span>
+                    <p className="text-gray-600 lowercase">
+                      {adminData.adminEmail}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <span className="font-semibold text-gray-700 w-32">
+                      Phone:
+                    </span>
+                    <p className="text-gray-600">{adminData.adminPhone}</p>
+                  </div>
+                </div>
               </div>
             </>
           )}
 
           {view === "addVaccine" && (
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h3 className="text-xl font-semibold mb-4 text-gray-700">
+            <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg mx-auto">
+              <h3 className="text-3xl font-bold mb-6 text-gray-800">
                 Add Vaccine
               </h3>
-              <div className="mb-4">
-                <label className="block text-gray-600 mb-2">Vaccine Name</label>
-                <input
-                  type="text"
-                  name="vaccineName"
-                  className="input input-bordered w-full"
-                  onChange={(e) => setVaccineName(e.target.value)}
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-600 mb-2">Description</label>
-                <textarea
-                  name="description"
-                  className="input input-bordered w-full"
-                  onChange={(e) => setVaccineDescription(e.target.value)}
-                ></textarea>
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-600 mb-2">Age Group</label>
-                <input
-                  type="text"
-                  name="ageGroup"
-                  className="input input-bordered w-full"
-                  onChange={(e) => setAgeGroup(e.target.value)}
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-600 mb-2">Capacity</label>
-                <input
-                  type="number"
-                  name="capacity"
-                  className="input input-bordered w-full"
-                  onChange={(e) => setCapacity(e.target.value)}
-                />
-              </div>
-              <button
-                type="submit"
-                className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-                onClick={handleAddVaccine}
-              >
-                Add Vaccine
-              </button>
+              <form className="space-y-6">
+                <div className="flex flex-col">
+                  <label className="text-lg font-semibold text-gray-700 mb-2">
+                    Vaccine Name
+                  </label>
+                  <input
+                    type="text"
+                    name="vaccineName"
+                    className="p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onChange={(e) => setVaccineName(e.target.value)}
+                    placeholder="Enter Vaccine Name"
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <label className="text-lg font-semibold text-gray-700 mb-2">
+                    Description
+                  </label>
+                  <textarea
+                    name="description"
+                    className="p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onChange={(e) => setVaccineDescription(e.target.value)}
+                    placeholder="Enter Vaccine Description"
+                  ></textarea>
+                </div>
+                <div className="flex flex-col">
+                  <label className="text-lg font-semibold text-gray-700 mb-2">
+                    Age Group
+                  </label>
+                  <input
+                    type="text"
+                    name="ageGroup"
+                    className="p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onChange={(e) => setAgeGroup(e.target.value)}
+                    placeholder="Enter Age Group"
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <label className="text-lg font-semibold text-gray-700 mb-2">
+                    Capacity
+                  </label>
+                  <input
+                    type="number"
+                    name="capacity"
+                    className="p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onChange={(e) => setCapacity(e.target.value)}
+                    placeholder="Enter Capacity"
+                  />
+                </div>
+                <button
+                  type="button"
+                  className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+                  onClick={handleAddVaccine}
+                >
+                  Add Vaccine
+                </button>
+              </form>
             </div>
           )}
 
           {view === "vaccines" && (
             <>
-              <h2 className="text-2xl font-bold mb-4">Available Vaccines</h2>
-              <div className="bg-white p-4 rounded shadow-md">
-                {vaccinationDetails?.vaccines?.length > 0 ? (
-                  <ul>
-                    {vaccinationDetails.vaccines.map((vaccine) => (
-                      <li key={vaccine.id} className="mb-4 p-4 border rounded">
-                        <p>
-                          <strong>Name:</strong> {vaccine.vaccineName}
-                        </p>
-                        <p>
-                          <strong>Description:</strong> {vaccine.description}
-                        </p>
-                        <p>
-                          <strong>Age Group:</strong> {vaccine.ageGroup}
-                        </p>
-                        <p>
-                          <strong>Capacity:</strong> {vaccine.capacity}
-                        </p>
-                      </li>
-                    ))}
-                  </ul>
+              <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
+                Available Vaccines
+              </h2>
+              <div className="overflow-x-auto bg-white p-6 rounded-lg shadow-lg capitalize ">
+                {vaccinationDetails?.vaccineDto?.length > 0 ? (
+                  <table className="min-w-full border border-gray-200">
+                    <thead className="bg-gradient-to-r from-blue-500 to-blue-700 text-white">
+                      <tr>
+                        <th className="px-6 py-4 text-center text-lg font-semibold uppercase tracking-wider">
+                          Name
+                        </th>
+                        <th className="px-6 py-4 text-center text-lg font-semibold uppercase tracking-wider">
+                          Description
+                        </th>
+                        <th className="px-6 py-4 text-center text-lg font-semibold uppercase tracking-wider">
+                          Age Group
+                        </th>
+                        <th className="px-6 py-4 text-center text-lg font-semibold uppercase tracking-wider">
+                          Capacity
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {vaccinationDetails.vaccineDto.map((vaccine, index) => (
+                        <tr
+                          key={vaccine.id}
+                          className={`hover:bg-blue-50 ${
+                            index % 2 === 0 ? "bg-gray-50" : ""
+                          }`}
+                        >
+                          <td className="px-6 py-4 text-center text-md text-gray-900">
+                            {vaccine.vaccineName}
+                          </td>
+                          <td className="px-6 py-4 text-center whitespace-normal text-md text-gray-700 lowercase">
+                            {vaccine.description}
+                          </td>
+                          <td className="px-6 py-4 text-center text-md text-gray-700">
+                            {vaccine.ageGroup}
+                          </td>
+                          <td className="px-6 py-4 text-center text-md text-gray-700">
+                            {vaccine.capacity}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 ) : (
-                  <p>No vaccines available.</p>
+                  <p className="text-center text-gray-500">
+                    No vaccines available.
+                  </p>
                 )}
               </div>
             </>
@@ -490,103 +567,94 @@ const AdminDashboard = () => {
 
           {view === "healthStaffRegister" && (
             <>
-              <h2 className="text-2xl font-bold mb-4">Register Health Staff</h2>
-              <div className="bg-white p-4 rounded shadow-md">
-                <div className="mb-4">
-                  <label className="block font-semibold">First Name</label>
-                  <input
-                    type="text"
-                    value={StaffFirstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    className="w-full p-2 border rounded"
-                  />
+              <h2 className="text-3xl font-bold mb-6 text-gray-800">
+                Register Health Staff
+              </h2>
+              <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg mx-auto">
+                <div className="space-y-6">
+                  <div className="flex flex-col">
+                    <label className="text-sm font-semibold text-gray-700 mb-2">
+                      First Name
+                    </label>
+                    <input
+                      type="text"
+                      value={StaffFirstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Enter First Name"
+                    />
+                  </div>
+                  <div className="flex flex-col">
+                    <label className="text-sm font-semibold text-gray-700 mb-2">
+                      Last Name
+                    </label>
+                    <input
+                      type="text"
+                      value={StaffLastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Enter Last Name"
+                    />
+                  </div>
+                  <div className="flex flex-col">
+                    <label className="text-sm font-semibold text-gray-700 mb-2">
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      value={StaffEmail}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Enter Email"
+                    />
+                  </div>
+                  <div className="flex flex-col">
+                    <label className="text-sm font-semibold text-gray-700 mb-2">
+                      Password
+                    </label>
+                    <input
+                      type="password"
+                      value={StaffPassword}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Enter Password"
+                    />
+                  </div>
+                  <div className="flex flex-col">
+                    <label className="text-sm font-semibold text-gray-700 mb-2">
+                      Phone Number
+                    </label>
+                    <input
+                      type="text"
+                      value={StaffPhone}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      maxLength={10}
+                      placeholder="Enter Phone Number"
+                    />
+                  </div>
+                  <div className="flex flex-col">
+                    <label className="text-sm font-semibold text-gray-700 mb-2">
+                      Aadhar Card Number
+                    </label>
+                    <input
+                      type="text"
+                      value={StaffAadhaarCard}
+                      onChange={(e) => setAadharCardNumber(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      maxLength={12}
+                      placeholder="Enter Aadhar Card Number"
+                    />
+                  </div>
+                  <button
+                    onClick={handleStaffRegistration}
+                    className="bg-blue-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+                  >
+                    Register
+                  </button>
                 </div>
-                <div className="mb-4">
-                  <label className="block font-semibold">Last Name</label>
-                  <input
-                    type="text"
-                    value={StaffLastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    className="w-full p-2 border rounded"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block font-semibold">Email</label>
-                  <input
-                    type="email"
-                    value={StaffEmail}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full p-2 border rounded"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block font-semibold">Password</label>
-                  <input
-                    type="password"
-                    value={StaffPassword}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full p-2 border rounded"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block font-semibold">Phone Number</label>
-                  <input
-                    type="text"
-                    value={StaffPhone}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    className="w-full p-2 border rounded"
-                    maxLength={10}
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block font-semibold">
-                    Aadhar Card Number
-                  </label>
-                  <input
-                    type="text"
-                    value={StaffAadhaarCard}
-                    onChange={(e) => setAadharCardNumber(e.target.value)}
-                    className="w-full p-2 border rounded"
-                    maxLength={12}
-                  />
-                </div>
-                <button
-                  onClick={handleStaffRegistration}
-                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
-                >
-                  Register
-                </button>
               </div>
             </>
-          )}
-
-          {view === "vaccines" && (
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h3 className="text-xl font-semibold mb-4 text-gray-700">
-                Available Vaccines
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {vaccinationDetails?.vaccineDto.map((vaccine, index) => (
-                  <div
-                    key={index}
-                    className="p-6 bg-gray-50 border border-gray-300 rounded-lg shadow-sm"
-                  >
-                    <h4 className="text-lg font-semibold text-gray-800 mb-2">
-                      Vaccine Name: {vaccine.vaccineName}
-                    </h4>
-                    <p className="text-gray-700 mb-2">
-                      <strong>Description:</strong> {vaccine.description}
-                    </p>
-                    <p className="text-gray-700 mb-2">
-                      <strong>Age Group:</strong> {vaccine.ageGroup}
-                    </p>
-                    <p className="text-gray-700">
-                      <strong>Capacity:</strong> {vaccine.capacity}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
           )}
         </main>
       </div>

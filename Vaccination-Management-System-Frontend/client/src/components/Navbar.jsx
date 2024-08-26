@@ -42,7 +42,7 @@ const MyNavbar = () => {
               <img
                 src="https://cdn-icons-png.flaticon.com/512/4191/4191422.png"
                 className="h-8"
-                alt="Flowbite Logo"
+                alt=" Logo"
               />
               <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
                 VacciCare
@@ -118,12 +118,12 @@ const MyNavbar = () => {
                         </button>
                       </li>
                       <li>
-                        <a
-                          href="#"
+                        <Link
+                          to="/login"
                           className="block px-4 py-2 hover:bg-gray-100"
                         >
                           Book an Appointment
-                        </a>
+                        </Link>
                       </li>
                     </ul>
                   </div>

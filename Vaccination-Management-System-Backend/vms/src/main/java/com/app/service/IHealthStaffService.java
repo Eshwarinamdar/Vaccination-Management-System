@@ -8,7 +8,6 @@ import com.app.dto.HealthStaffDTO;
 import com.app.dto.HealthStaffUpdateDTO;
 import com.app.dto.LoginDTO;
 import com.app.dto.StaffandAppointmentIdDTO;
-import com.app.entities.Appointments;
 import com.app.entities.HealthStaff;
 
 public interface IHealthStaffService {
