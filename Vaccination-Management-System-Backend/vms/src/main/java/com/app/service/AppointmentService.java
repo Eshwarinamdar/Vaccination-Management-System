@@ -94,7 +94,7 @@ public class AppointmentService implements IAppointmentService {
 	}
 
 	public String assignVaccineToAppointment(AppointmentDetails2DTO dto) {
-		// Fetch the appointment by appointmentId
+		
 		Appointments appointment = appointmentRepo.findByAppointmentId(dto.getAppointmentId());
 		if (appointment == null) {
 			return "Appointment not found!";
